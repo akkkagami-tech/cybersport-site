@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="kk" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Киберспорт Әлемі</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root[data-theme="light"]{
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#e8edf8;--card:#ffffff;
+  --text:#1a1f36;--text2:#4a5280;--text3:#8892b0;
+  --accent:#2563eb;--accent2:#1d4ed8;--accent-soft:#dbeafe;
+  --border:#e2e8f0;--shadow:0 2px 16px rgba(37,99,235,0.08);
+  --nav-bg:rgba(255,255,255,0.92);--hero-glow:rgba(37,99,235,0.12);
+  --tag-bg:#dbeafe;--tag-text:#1d4ed8;
+  --chat-user:#2563eb;--chat-bot:#f0f4ff;--chat-bot-text:#1a1f36;
+  --particle-color:37,99,235;
+}
+:root[data-theme="dark"]{
+  --bg:#0d1117;--bg2:#161b27;--bg3:#1e2538;--card:#1e2538;
+  --text:#e6eaf7;--text2:#8892b0;--text3:#4a5280;
+  --accent:#3b82f6;--accent2:#60a5fa;--accent-soft:#1e3a5f;
+  --border:#2d3554;--shadow:0 2px 20px rgba(0,0,0,0.4);
+  --nav-bg:rgba(13,17,23,0.95);--hero-glow:rgba(59,130,246,0.18);
+  --tag-bg:#1e3a5f;--tag-text:#60a5fa;
+  --chat-user:#2563eb;--chat-bot:#1e2538;--chat-bot-text:#e6eaf7;
+  --particle-color:96,165,250;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;line-height:1.6;margin:0;padding:0;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;transition:background .3s;}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--accent);letter-spacing:.04em;text-decoration:none;}
+.logo span{color:var(--text);}
+.nav-links{display:flex;gap:1.8rem;align-items:center;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:.9rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--accent);}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);border-radius:50px;width:52px;height:28px;cursor:pointer;position:relative;transition:background .3s;display:flex;align-items:center;padding:3px;}
+.theme-btn::after{content:'';width:22px;height:22px;border-radius:50%;background:var(--accent);transition:transform .3s;display:block;}
+[data-theme="dark"] .theme-btn::after{transform:translateX(24px);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 2rem 4rem;background:var(--bg);position:relative;overflow:hidden;}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.hero-inner{position:relative;z-index:1;max-width:720px;}
+.hero-badge{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:6px 18px;border-radius:50px;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:700;line-height:1.1;margin-bottom:1rem;}
+.hero h1 .hl{color:var(--accent);}
+.hero p{font-size:1.1rem;color:var(--text2);max-width:540px;margin:0 auto 2.5rem;}
+.hero-cta{display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+.btn{padding:.75rem 2rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;border:none;font-family:'Noto Sans',sans-serif;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--accent);border:1.5px solid var(--accent);}
+.btn-outline:hover{background:var(--accent-soft);}
+
+/* SECTIONS */
+section{padding:5rem 2rem;max-width:1100px;margin:0 auto;}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;margin-bottom:.4rem;color:var(--text);}
+.section-sub{color:var(--text2);margin-bottom:2.5rem;font-size:.95rem;}
+.section-line{width:48px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:.8rem;}
+
+/* STATS */
+.stats{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stats-inner{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;max-width:900px;margin:0 auto;padding:3rem 2rem;}
+.stat-item{text-align:center;padding:1.5rem 1rem;border-right:1px solid var(--border);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:'Rajdhani',sans-serif;font-size:2.4rem;font-weight:700;color:var(--accent);}
+.stat-label{font-size:.8rem;color:var(--text2);margin-top:4px;}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:box-shadow .2s,transform .2s;box-shadow:var(--shadow);}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(37,99,235,0.12);}
+.card-icon{width:44px;height:44px;background:var(--accent-soft);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;}
+.card h3{font-size:1rem;font-weight:600;margin-bottom:.5rem;}
+.card p{font-size:.88rem;color:var(--text2);line-height:1.6;}
+
+/* GAMES */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.2rem;}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
+.game-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.game-emoji{font-size:2rem;margin-bottom:.7rem;display:block;}
+.game-name{font-weight:600;font-size:.9rem;margin-bottom:4px;}
+.game-tag{display:inline-block;background:var(--tag-bg);color:var(--tag-text);padding:2px 10px;border-radius:50px;font-size:.72rem;font-weight:500;}
+
+/* TOURNAMENTS */
+.tournaments-list{display:flex;flex-direction:column;gap:1rem;}
+.tournament-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;box-shadow:var(--shadow);}
+.t-info{flex:1;min-width:200px;}
+.t-name{font-weight:600;font-size:.95rem;}
+.t-game{font-size:.8rem;color:var(--text2);margin-top:2px;}
+.t-badge{padding:4px 14px;border-radius:50px;font-size:.75rem;font-weight:600;}
+.badge-live{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+.badge-soon{background:#fff7ed;color:#d97706;border:1px solid #fed7aa;}
+.badge-done{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;}
+[data-theme="dark"] .badge-live{background:#450a0a;color:#f87171;border-color:#7f1d1d;}
+[data-theme="dark"] .badge-soon{background:#431407;color:#fb923c;border-color:#7c2d12;}
+[data-theme="dark"] .badge-done{background:#052e16;color:#4ade80;border-color:#14532d;}
+.t-prize{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);white-space:nowrap;}
+
+/* PLAYERS */
+.players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.player-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .2s;}
+.player-card:hover{transform:translateY(-3px);}
+.player-header{padding:1.5rem 1.5rem 1rem;display:flex;align-items:center;gap:14px;}
+.player-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0;}
+.av-blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1d4ed8;}
+.av-green{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#15803d;}
+.av-purple{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#7c3aed;}
+.av-orange{background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#c2410c;}
+.av-red{background:linear-gradient(135deg,#fef2f2,#fecaca);color:#dc2626;}
+[data-theme="dark"] .av-blue{background:linear-gradient(135deg,#1e3a5f,#1e40af);color:#93c5fd;}
+[data-theme="dark"] .av-green{background:linear-gradient(135deg,#052e16,#14532d);color:#4ade80;}
+[data-theme="dark"] .av-purple{background:linear-gradient(135deg,#2e1065,#4c1d95);color:#c4b5fd;}
+[data-theme="dark"] .av-orange{background:linear-gradient(135deg,#431407,#7c2d12);color:#fb923c;}
+[data-theme="dark"] .av-red{background:linear-gradient(135deg,#450a0a,#7f1d1d);color:#f87171;}
+.player-meta h3{font-size:1rem;font-weight:700;}
+.player-meta .nickname{font-size:.85rem;color:var(--accent);font-weight:600;margin-bottom:2px;}
+.player-meta .game-pill{display:inline-block;background:var(--tag-bg);color:var(--tag-text);padding:2px 10px;border-radius:50px;font-size:.7rem;font-weight:600;}
+.player-body{padding:0 1.5rem 1.5rem;}
+.player-body p{font-size:.84rem;color:var(--text2);line-height:1.6;margin-bottom:.8rem;}
+.player-achievements{display:flex;flex-direction:column;gap:5px;}
+.ach-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text);}
+.ach-item::before{content:'🏅';font-size:.75rem;}
+.player-footer{padding:.8rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.player-country{font-size:.78rem;color:var(--text2);}
+.player-rank{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:var(--accent);}
+
+/* NEWS */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.news-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:transform .2s;}
+.news-card:hover{transform:translateY(-2px);}
+.news-thumb{height:130px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.news-thumb.v1{background:linear-gradient(135deg,#dbeafe,#ede9fe);}
+.news-thumb.v2{background:linear-gradient(135deg,#dcfce7,#d1fae5);}
+.news-thumb.v3{background:linear-gradient(135deg,#fff7ed,#fef9c3);}
+[data-theme="dark"] .news-thumb.v1{background:linear-gradient(135deg,#1e3a5f,#2e1b5f);}
+[data-theme="dark"] .news-thumb.v2{background:linear-gradient(135deg,#052e16,#064e3b);}
+[data-theme="dark"] .news-thumb.v3{background:linear-gradient(135deg,#431407,#422006);}
+.news-body{padding:1.2rem;}
+.news-date{font-size:.75rem;color:var(--text3);margin-bottom:6px;}
+.news-title{font-weight:600;font-size:.9rem;line-height:1.4;margin-bottom:6px;}
+.news-excerpt{font-size:.82rem;color:var(--text2);line-height:1.5;}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center;color:var(--text2);font-size:.85rem;}
+footer .logo{font-size:1.2rem;display:block;margin-bottom:.5rem;}
+
+/* BACK TOP */
+.back-top{position:fixed;bottom:90px;right:24px;width:44px;height:44px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,99,235,.3);transition:opacity .3s,transform .2s;opacity:0;pointer-events:none;z-index:150;}
+.back-top.visible{opacity:1;pointer-events:all;}
+.back-top:hover{transform:translateY(-2px);}
+
+/* ===== FLOATING CHAT WIDGET ===== */
+#chatBubble{position:fixed;bottom:24px;left:24px;z-index:9999;width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,.45);display:flex;align-items:center;justify-content:center;font-size:1.4rem;transition:transform .2s,box-shadow .2s;}
+#chatBubble:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(37,99,235,.55);}
+#chatBubble .bubble-badge{position:absolute;top:-3px;right:-3px;width:18px;height:18px;background:#ef4444;border-radius:50%;border:2px solid var(--bg);font-size:.6rem;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+#chatWindow{position:fixed;bottom:92px;left:24px;z-index:9998;width:360px;height:520px;min-width:280px;min-height:320px;max-width:calc(100vw - 48px);max-height:calc(100vh - 120px);background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;transform:scale(0.85) translateY(20px);transform-origin:bottom left;opacity:0;pointer-events:none;transition:transform .25s cubic-bezier(.34,1.56,.64,1),opacity .2s;user-select:none;}
+#chatWindow.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+#chatWindow.resizing,#chatWindow.dragging{transition:none;}
+
+.rz{position:absolute;z-index:10;}
+.rz-n{top:-4px;left:12px;right:12px;height:8px;cursor:n-resize!important;}
+.rz-s{bottom:-4px;left:12px;right:12px;height:8px;cursor:s-resize!important;}
+.rz-e{right:-4px;top:12px;bottom:12px;width:8px;cursor:e-resize!important;}
+.rz-w{left:-4px;top:12px;bottom:12px;width:8px;cursor:w-resize!important;}
+.rz-ne{top:-4px;right:-4px;width:16px;height:16px;cursor:ne-resize!important;}
+.rz-nw{top:-4px;left:-4px;width:16px;height:16px;cursor:nw-resize!important;}
+.rz-se{bottom:-4px;right:-4px;width:16px;height:16px;cursor:se-resize!important;}
+.rz-sw{bottom:-4px;left:-4px;width:16px;height:16px;cursor:sw-resize!important;}
+.rz-se::after{content:'';position:absolute;bottom:5px;right:5px;width:8px;height:8px;background:radial-gradient(circle,var(--text3) 1px,transparent 1px);background-size:3px 3px;border-radius:1px;opacity:.6;}
+
+.cw-header{background:var(--accent);padding:.9rem 1.1rem;display:flex;align-items:center;gap:10px;flex-shrink:0;cursor:move!important;-webkit-user-select:none;user-select:none;}
+.cw-avatar{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.cw-title{flex:1;}
+.cw-title h4{color:#fff;font-size:.88rem;font-weight:600;margin-bottom:1px;}
+.cw-title p{color:rgba(255,255,255,.7);font-size:.7rem;}
+.cw-header-actions{display:flex;align-items:center;gap:4px;}
+.cw-close,.cw-clear{background:none;border:none;color:rgba(255,255,255,.8);font-size:1rem;cursor:pointer;padding:3px 6px;border-radius:6px;transition:background .2s;font-family:'Noto Sans',sans-serif;}
+.cw-close:hover,.cw-clear:hover{background:rgba(255,255,255,.2);}
+.cw-status-dot{width:7px;height:7px;background:#4ade80;border-radius:50%;margin-right:4px;}
+
+.cw-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem;scroll-behavior:smooth;min-height:0;}
+.cw-messages::-webkit-scrollbar{width:3px;}
+.cw-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.cm{display:flex;gap:7px;max-width:92%;}
+.cm.user{align-self:flex-end;flex-direction:row-reverse;}
+.cm-bub{padding:.55rem .85rem;border-radius:14px;font-size:.82rem;line-height:1.5;}
+.cm.bot .cm-bub{background:var(--chat-bot);color:var(--chat-bot-text);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.cm.user .cm-bub{background:var(--chat-user);color:#fff;border-bottom-right-radius:4px;}
+.cm-av{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--accent);flex-shrink:0;align-self:flex-end;font-weight:600;}
+.cm.user .cm-av{background:var(--accent);color:#fff;}
+.cm-time{font-size:.62rem;color:var(--text3);margin-top:3px;padding:0 2px;}
+.cm.user .cm-time{text-align:right;}
+
+.cw-chips{display:flex;flex-wrap:wrap;gap:5px;padding:.5rem 1rem 0;}
+.cw-chip{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:50px;font-size:.72rem;cursor:pointer;color:var(--text2);transition:all .15s;font-family:'Noto Sans',sans-serif;}
+.cw-chip:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
+
+.cw-footer{padding:.7rem .9rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.cw-input-row{display:flex;gap:7px;}
+.cw-input{flex:1;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s;}
+.cw-input:focus{border-color:var(--accent);}
+.cw-send{padding:.55rem .9rem;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'Noto Sans',sans-serif;transition:background .2s;white-space:nowrap;}
+.cw-send:hover{background:var(--accent2);}
+.cw-send:disabled{opacity:.55;}
+.cw-mic{width:36px;height:36px;padding:0;border-radius:10px;background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;cursor:pointer;}
+.cw-mic:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+.cw-mic.listening{background:#fef2f2;border-color:#dc2626;color:#dc2626;animation:micPulse 1s infinite;}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3);}50%{box-shadow:0 0 0 6px rgba(220,38,38,0);}}
+.mic-hint{font-size:.68rem;color:var(--text3);text-align:center;}
+
+.t-dot{display:inline-block;width:5px;height:5px;background:var(--text2);border-radius:50%;margin:0 2px;animation:tdot 1.2s infinite;}
+.t-dot:nth-child(2){animation-delay:.2s;}
+.t-dot:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+@media(max-width:640px){
+  .nav-links{display:none;}
+  #chatWindow{width:calc(100vw - 48px);}
+  .stats-inner{grid-template-columns:repeat(2,1fr);}
+  .stat-item:nth-child(2){border-right:none;}
+}
+</style>
+</head>
+<body>
+
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">CYBER<span>СПОРТ</span></a>
+  <div class="nav-links">
+    <a href="#games">Ойындар</a>
+    <a href="#players">Ойыншылар</a>
+    <a href="#tournaments">Турнирлер</a>
+    <a href="#news">Жаңалықтар</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="theme-btn" id="themeToggle" title="Тақырыпты ауыстыру"></button>
+    <span id="themeIcon" style="font-size:1rem;">☀️</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home" style="max-width:100%;padding-top:80px;">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-badge">🎮 Қазақстандық Киберспорт Платформасы</div>
+    <h1>Киберспорт<br><span class="hl">Әлеміне</span> Қош Келдіңіз</h1>
+    <p>Командалар, ойын түрлері, турнирлер және соңғы жаңалықтар. Төменгі сол жақтағы AI агентке кез келген сұрақ қойыңыз.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="openChat()">🤖 AI Агентке сұраңыз</button>
+      <a href="#tournaments" class="btn btn-outline">Турнирлерді қараңыз</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats" id="statsSection">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num" data-target="500" data-suffix="+">0</div><div class="stat-label">Белсенді ойыншылар</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="12">0</div><div class="stat-label">Жыл сайынғы турнирлер</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="50" data-prefix="₸" data-suffix="М+">0</div><div class="stat-label">Жалпы жүлде қоры</div></div>
+    <div class="stat-item"><div class="stat-num" data-target="8">0</div><div class="stat-label">Ойын түрлері</div></div>
+  </div>
+</div>
+
+<!-- GAMES -->
+<section id="games">
+  <div class="section-line"></div>
+  <h2 class="section-title">Ойын Түрлері</h2>
+  <p class="section-sub">Қазақстанда ең танымал киберспорт дисциплиналары</p>
+  <div class="games-grid">
+    <div class="game-card"><span class="game-emoji">🎯</span><div class="game-name">Valorant</div><span class="game-tag">FPS</span></div>
+    <div class="game-card"><span class="game-emoji">🔫</span><div class="game-name">CS2</div><span class="game-tag">FPS</span></div>
+    <div class="game-card"><span class="game-emoji">⚔️</span><div class="game-name">Dota 2</div><span class="game-tag">MOBA</span></div>
+    <div class="game-card"><span class="game-emoji">🧟</span><div class="game-name">League of Legends</div><span class="game-tag">MOBA</span></div>
+    <div class="game-card"><span class="game-emoji">⚽</span><div class="game-name">EA FC 25</div><span class="game-tag">Спорт</span></div>
+    <div class="game-card"><span class="game-emoji">🏆</span><div class="game-name">PUBG Mobile</div><span class="game-tag">Battle Royale</span></div>
+    <div class="game-card"><span class="game-emoji">🌟</span><div class="game-name">Brawl Stars</div><span class="game-tag">Mobile</span></div>
+    <div class="game-card"><span class="game-emoji">🧊</span><div class="game-name">Hearthstone</div><span class="game-tag">Карта ойыны</span></div>
+  </div>
+</section>
+
+<!-- INFO CARDS -->
+<section style="padding-top:0;">
+  <div class="section-line"></div>
+  <h2 class="section-title">Киберспорт туралы</h2>
+  <p class="section-sub">Ойыншылар мен жаңадан бастаушылар үшін пайдалы ақпарат</p>
+  <div class="cards">
+    <div class="card"><div class="card-icon">🏅</div><h3>Кәсіби ойыншы болу</h3><p>Кәсіби деңгейге жету үшін күнделікті жаттығу, командалық жұмыс және стратегиялық ойлау қажет. Жергілікті турнирлерден бастаңыз.</p></div>
+    <div class="card"><div class="card-icon">💻</div><h3>Жабдықтар мен орнату</h3><p>Жақсы ойын тышқаны, жиілігі жоғары монитор және тұрақты интернет — табыстың негізі. 144Hz монитор мен 400-800 eDPI мышь оңтайлы.</p></div>
+    <div class="card"><div class="card-icon">🤝</div><h3>Командалар мен клубтар</h3><p>Алматы мен Астанада бірнеше профессионалды киберспорт клубтары бар. Оларға қосылып, тренировкаларға қатысыңыз.</p></div>
+    <div class="card"><div class="card-icon">📈</div><h3>Қазақстандағы киберспорт</h3><p>Қазақстан 2021 жылдан бастап мемлекеттік деңгейде киберспортты ресми спорт түрі ретінде таниды.</p></div>
+    <div class="card"><div class="card-icon">🎓</div><h3>Оқу және даму</h3><p>YouTube, Twitch және мамандандырылған курстар арқылы ойын стратегияларын үйреніп, нәтижелеріңізді жақсартыңыз.</p></div>
+    <div class="card"><div class="card-icon">💰</div><h3>Кірістер мен мансап</h3><p>Стриминг, жарнама, турнир жүлделері және спонсорлық — киберспорттан табыс табудың негізгі жолдары.</p></div>
+  </div>
+</section>
+
+<!-- KZ PLAYERS -->
+<section id="players">
+  <div class="section-line"></div>
+  <h2 class="section-title">Қазақстандық Киберспортшылар</h2>
+  <p class="section-sub">Отандық ойыншылардың жетістіктері мен мансабы</p>
+  <div class="players-grid">
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-blue">МЭ</div><div class="player-meta"><div class="nickname">Молодой Экей</div><h3>Данил Иманкулов</h3><span class="game-pill">CS / CS2</span></div></div>
+      <div class="player-body"><p>Қазақстанның ең танымал CS2 стримері және контент жасаушысы. YouTube пен Twitch-те миллиондаған қараушы жинады.</p><div class="player-achievements"><div class="ach-item">YouTube-те 1М+ жазылушы жинаған</div><div class="ach-item">КЗ CS2 қоғамдастығының белсенді мүшесі</div><div class="ach-item">Жергілікті турнирлер ұйымдастырушысы</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Алматы</span><span class="player-rank">Стример / Контент</span></div>
+    </div>
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-orange">KZ</div><div class="player-meta"><div class="nickname">buster</div><h3>Қайрат Жахсыбеков</h3><span class="game-pill">CS:GO / CS2</span></div></div>
+      <div class="player-body"><p>NaVi командасының мүшесі. Халықаралық деңгейде Қазақстан туын желбіреткен алғашқы ойыншылардың бірі.</p><div class="player-achievements"><div class="ach-item">NaVi — CIS чемпионы</div><div class="ach-item">ESL Pro League қатысушысы</div><div class="ach-item">BLAST Premier турнирлері</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Қазақстан</span><span class="player-rank">Кәсіби ойыншы</span></div>
+    </div>
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-purple">AD</div><div class="player-meta"><div class="nickname">AdreN</div><h3>Даурен Кыстаубаев</h3><span class="game-pill">CS:GO / CS2</span></div></div>
+      <div class="player-body"><p>Gambit Gaming, NaVi, Virtus.pro командаларында ойнаған аңызға айналған AWP ойыншы.</p><div class="player-achievements"><div class="ach-item">IEM Katowice чемпионы</div><div class="ach-item">NaVi командасының капитаны</div><div class="ach-item">HLTV Top-20 тізімінде</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Алматы</span><span class="player-rank">Топ деңгей AWPer</span></div>
+    </div>
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-green">MA</div><div class="player-meta"><div class="nickname">mou</div><h3>Нұрлан Момбеков</h3><span class="game-pill">CS:GO</span></div></div>
+      <div class="player-body"><p>Gambit Gaming легендасы. 2017 жылы PGL Major Kraków чемпионатында MVP атанып, HLTV бойынша №1 ойыншы болды.</p><div class="player-achievements"><div class="ach-item">PGL Major Kraków 2017 — Чемпион</div><div class="ach-item">HLTV 2017 — №1 ойыншы</div><div class="ach-item">Major MVP атағы</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Алматы</span><span class="player-rank">Дүниежүзілік Чемпион</span></div>
+    </div>
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-red">ZY</div><div class="player-meta"><div class="nickname">Zayac</div><h3>Ильяс Илисханов</h3><span class="game-pill">Dota 2</span></div></div>
+      <div class="player-body"><p>Virtus.pro командасының Dota 2 ойыншысы. The International турнирлеріне қатысқан.</p><div class="player-achievements"><div class="ach-item">The International — Top-8</div><div class="ach-item">ESL One жеңімпазы</div><div class="ach-item">DPC Лига қатысушысы</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Қазақстан</span><span class="player-rank">Кәсіби Dota 2</span></div>
+    </div>
+    <div class="player-card">
+      <div class="player-header"><div class="player-avatar av-blue">KE</div><div class="player-meta"><div class="nickname">KaiZerEs</div><h3>Ерлан Дюсенов</h3><span class="game-pill">Valorant</span></div></div>
+      <div class="player-body"><p>Қазақстандағы Valorant киберспортының алғашқы кәсіби ойыншыларының бірі. Регионалдық деңгейге шыққан.</p><div class="player-achievements"><div class="ach-item">Қазақстан Valorant чемпионы 2024</div><div class="ach-item">CIS Open Qualifier — Top-4</div><div class="ach-item">Immortal 3 рейтинг</div></div></div>
+      <div class="player-footer"><span class="player-country">🇰🇿 Астана</span><span class="player-rank">Valorant Pro</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TOURNAMENTS -->
+<section id="tournaments">
+  <div class="section-line"></div>
+  <h2 class="section-title">Турнирлер</h2>
+  <p class="section-sub">Ағымдағы және жоспарланған киберспорт жарыстары</p>
+  <div class="tournaments-list">
+    <div class="tournament-item"><div class="t-info"><div class="t-name">Алматы Open 2026 — Valorant</div><div class="t-game">Valorant · 5v5 · Алматы, Almaty Arena</div></div><span class="t-badge badge-live">🔴 Тікелей эфир</span><div class="t-prize">₸2 500 000</div></div>
+    <div class="tournament-item"><div class="t-info"><div class="t-name">Kazakhstan CS2 Championship</div><div class="t-game">CS2 · 5v5 · Онлайн + Финал Астана</div></div><span class="t-badge badge-soon">🟠 Жақында</span><div class="t-prize">₸5 000 000</div></div>
+    <div class="tournament-item"><div class="t-info"><div class="t-name">PUBG Mobile KZ Spring Cup</div><div class="t-game">PUBG Mobile · Squads · Онлайн</div></div><span class="t-badge badge-soon">🟠 Тіркелу ашық</span><div class="t-prize">₸1 200 000</div></div>
+    <div class="tournament-item"><div class="t-info"><div class="t-name">Dota 2 Winter League 2025</div><div class="t-game">Dota 2 · 5v5 · Алматы</div></div><span class="t-badge badge-done">✅ Аяқталды</span><div class="t-prize">₸3 000 000</div></div>
+    <div class="tournament-item"><div class="t-info"><div class="t-name">Narxoz Esports Cup 2026</div><div class="t-game">CS2, Valorant · Студенттер · Алматы</div></div><span class="t-badge badge-soon">🟠 Маусым</span><div class="t-prize">₸800 000</div></div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news">
+  <div class="section-line"></div>
+  <h2 class="section-title">Соңғы Жаңалықтар</h2>
+  <p class="section-sub">Киберспорт дүниесіндегі соңғы оқиғалар</p>
+  <div class="news-grid">
+    <div class="news-card"><div class="news-thumb v1">🏆</div><div class="news-body"><div class="news-date">28 Сәуір 2026</div><div class="news-title">Молодой Экей жаңа CS2 турнирін жариялады</div><div class="news-excerpt">Танымал стример ₸500,000 жүлделі жаңа КЗ ашық турнирін ұйымдастыратынын хабарлады.</div></div></div>
+    <div class="news-card"><div class="news-thumb v2">🎮</div><div class="news-body"><div class="news-date">25 Сәуір 2026</div><div class="news-title">PUBG Mobile KZ Spring Cup-қа тіркелу ашылды</div><div class="news-excerpt">Барлық ойыншылар 10 мамырға дейін ресми сайт арқылы тіркелуге шақырылады.</div></div></div>
+    <div class="news-card"><div class="news-thumb v3">⚡</div><div class="news-body"><div class="news-date">20 Сәуір 2026</div><div class="news-title">Narxoz университеті жаңа eSports зертханасын ашты</div><div class="news-excerpt">Цифрлық технологиялар мектебінде 30 жоғары жылдамдықты ойын компьютері бар студия іске қосылды.</div></div></div>
+  </div>
+</section>
+
+<footer>
+  <a href="#" class="logo">CYBER<span>СПОРТ</span></a>
+  <p>Нархоз Университеті · Цифрлық Технологиялар Мектебі · 2026</p>
+  <p style="margin-top:6px;font-size:.75rem;color:var(--text3);">Жоба: «Киберспорт Әлемі» · AI Агент: Claude Sonnet 4</p>
+</footer>
+
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- FLOATING CHAT BUBBLE -->
+<button id="chatBubble" onclick="toggleChat()" title="AI Агент">
+  <span id="bubbleIcon">🤖</span>
+  <span class="bubble-badge" id="bubbleBadge">1</span>
+</button>
+
+<!-- FLOATING CHAT WINDOW -->
+<div id="chatWindow">
+  <div class="rz rz-n" data-dir="n"></div>
+  <div class="rz rz-s" data-dir="s"></div>
+  <div class="rz rz-e" data-dir="e"></div>
+  <div class="rz rz-w" data-dir="w"></div>
+  <div class="rz rz-ne" data-dir="ne"></div>
+  <div class="rz rz-nw" data-dir="nw"></div>
+  <div class="rz rz-se" data-dir="se"></div>
+  <div class="rz rz-sw" data-dir="sw"></div>
+  <div class="cw-header" id="cwDragHandle">
+    <div class="cw-avatar">🤖</div>
+    <div class="cw-title">
+      <h4>CyberBot — AI Агент</h4>
+      <p style="display:flex;align-items:center;gap:4px;"><span class="cw-status-dot"></span>Онлайн · Қазақ тілінде</p>
+    </div>
+    <div class="cw-header-actions">
+      <button class="cw-clear" onclick="clearChat()" title="Чатты тазалау">🗑</button>
+      <button class="cw-close" onclick="toggleChat()">✕</button>
+    </div>
+  </div>
+  <div class="cw-messages" id="cwMessages">
+    <div class="cm bot">
+      <div class="cm-av">🤖</div>
+      <div style="display:flex;flex-direction:column;">
+        <div class="cm-bub">Сәлем! 👋 Мен CyberBot — киберспорт бойынша AI агентпін. Ойындар, турнирлер, ойыншылар туралы кез келген сұрақ қойыңыз!</div>
+        <span class="cm-time" id="initTime"></span>
+      </div>
+    </div>
+  </div>
+  <div class="cw-chips" id="cwChips">
+    <button class="cw-chip" onclick="cwSendChip(this)">mou кім?</button>
+    <button class="cw-chip" onclick="cwSendChip(this)">CS2 бастау</button>
+    <button class="cw-chip" onclick="cwSendChip(this)">Valorant не?</button>
+    <button class="cw-chip" onclick="cwSendChip(this)">eDPI дегеніміз не?</button>
+  </div>
+  <div class="cw-footer">
+    <div class="cw-input-row">
+      <input class="cw-input" id="cwInput" placeholder="Сұрақ жазыңыз..." onkeydown="if(event.key==='Enter')cwSend()">
+      <button class="cw-mic" id="cwMic" onclick="toggleMic()" title="Дауыспен жазу">🎤</button>
+      <button class="cw-send" id="cwSendBtn" onclick="cwSend()">↗</button>
+    </div>
+    <div class="mic-hint" id="micHint" style="display:none;">🔴 Тыңдап жатыр... Аяқтау үшін қайта басыңыз</div>
+  </div>
+</div>
+
+<script>
+// ===== THEME =====
+const html=document.documentElement;
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const dark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('themeIcon').textContent=dark?'☀️':'🌙';
+  initParticles();
+});
+
+// ===== SCROLL =====
+window.addEventListener('scroll',()=>{
+  document.getElementById('backTop').classList.toggle('visible',window.scrollY>400);
+});
+
+// ===== HERO PARTICLES =====
+const canvas=document.getElementById('heroCanvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+function getColor(){
+  const c=getComputedStyle(document.documentElement).getPropertyValue('--particle-color').trim();
+  return c||'37,99,235';
+}
+function resizeCanvas(){
+  const hero=document.querySelector('.hero');
+  canvas.width=hero.offsetWidth;
+  canvas.height=hero.offsetHeight;
+}
+function initParticles(){
+  resizeCanvas();
+  particles=[];
+  const count=Math.floor(canvas.width*canvas.height/14000);
+  for(let i=0;i<count;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      vx:(Math.random()-.5)*.4,
+      vy:(Math.random()-.5)*.4,
+      r:Math.random()*2+1,
+      alpha:Math.random()*.5+.2
+    });
+  }
+}
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const color=getColor();
+  const W=canvas.width,H=canvas.height;
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+    if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${color},${p.alpha})`;
+    ctx.fill();
+  });
+  // connect nearby particles
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(${color},${.15*(1-dist/100)})`;
+        ctx.lineWidth=.6;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+window.addEventListener('resize',initParticles);
+initParticles();
+drawParticles();
+
+// ===== STAT COUNTER ANIMATION =====
+let statsAnimated=false;
+function animateStats(){
+  if(statsAnimated)return;
+  statsAnimated=true;
+  document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+    const target=+el.dataset.target;
+    const prefix=el.dataset.prefix||'';
+    const suffix=el.dataset.suffix||'';
+    let current=0;
+    const duration=1400;
+    const start=performance.now();
+    function step(now){
+      const elapsed=now-start;
+      const progress=Math.min(elapsed/duration,1);
+      // ease out cubic
+      const eased=1-Math.pow(1-progress,3);
+      current=Math.round(eased*target);
+      el.textContent=prefix+current+suffix;
+      if(progress<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+const statsObs=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting)animateStats();
+},{threshold:.4});
+statsObs.observe(document.getElementById('statsSection'));
+
+// ===== CHAT WIDGET =====
+let cwOpen=false;
+let cwHistory=[];
+const SYSTEM=`Сен — "CyberBot", киберспорт тақырыбындағы AI агентсің. ТЕК қазақ тілінде жауап бер.
+Тақырыптарың: видео ойындар (Valorant, CS2, Dota 2, PUBG Mobile, LoL, EA FC), турнирлер, командалар, кәсіби ойыншылар, жабдықтар, мышь баптаулары (eDPI, DPI), стриминг, Қазақстандағы киберспорт.
+КЗ ойыншылар: mou (Нұрлан Момбеков) — 2017 Major чемпионы, HLTV №1; AdreN — NaVi/Gambit AWP; buster — NaVi; Молодой Экей (Данил) — CS2 стример; Zayac — Dota 2 Virtus.pro.
+Қысқа (3-5 сөйлем), достық, эмодзи қолдан.`;
+
+function getTime(){
+  return new Date().toLocaleTimeString('kk-KZ',{hour:'2-digit',minute:'2-digit'});
+}
+document.getElementById('initTime').textContent=getTime();
+
+function toggleChat(){
+  cwOpen=!cwOpen;
+  const win=document.getElementById('chatWindow');
+  win.classList.toggle('open',cwOpen);
+  document.getElementById('bubbleBadge').style.display=cwOpen?'none':'flex';
+  document.getElementById('bubbleIcon').textContent=cwOpen?'✕':'🤖';
+  if(cwOpen)setTimeout(()=>document.getElementById('cwInput').focus(),300);
+}
+function openChat(){if(!cwOpen)toggleChat();}
+
+function clearChat(){
+  const w=document.getElementById('cwMessages');
+  w.innerHTML=`<div class="cm bot"><div class="cm-av">🤖</div><div style="display:flex;flex-direction:column;"><div class="cm-bub">Чат тазаланды 🗑 Жаңа сұрақ қойыңыз!</div><span class="cm-time">${getTime()}</span></div></div>`;
+  cwHistory=[];
+  document.getElementById('cwChips').style.display='flex';
+}
+
+async function cwSend(){
+  const inp=document.getElementById('cwInput');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  document.getElementById('cwChips').style.display='none';
+  cwAddMsg('user',txt);
+  cwHistory.push({role:'user',content:txt});
+  cwShowTyping();
+  const sb=document.getElementById('cwSendBtn');
+  sb.disabled=true;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:cwHistory})
+    });
+    const d=await r.json();
+    cwRemoveTyping();
+    const reply=d.content?.[0]?.text||'Кешіріңіз, қате орын алды.';
+    cwHistory.push({role:'assistant',content:reply});
+    cwAddMsg('bot',reply);
+  }catch(e){
+    cwRemoveTyping();
+    cwAddMsg('bot','Байланыс қатесі орын алды 😕');
+  }
+  sb.disabled=false;
+}
+function cwSendChip(el){document.getElementById('cwInput').value=el.textContent;cwSend();}
+
+function cwAddMsg(role,text){
+  const w=document.getElementById('cwMessages');
+  const d=document.createElement('div');
+  d.className='cm '+role;
+  d.innerHTML=`<div class="cm-av">${role==='bot'?'🤖':'👤'}</div><div style="display:flex;flex-direction:column;${role==='user'?'align-items:flex-end;':''}"><div class="cm-bub">${text}</div><span class="cm-time">${getTime()}</span></div>`;
+  w.appendChild(d);
+  w.scrollTop=w.scrollHeight;
+}
+function cwShowTyping(){
+  const w=document.getElementById('cwMessages');
+  const d=document.createElement('div');d.className='cm bot';d.id='cwTyping';
+  d.innerHTML=`<div class="cm-av">🤖</div><div class="cm-bub"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>`;
+  w.appendChild(d);w.scrollTop=w.scrollHeight;
+}
+function cwRemoveTyping(){const t=document.getElementById('cwTyping');if(t)t.remove();}
+
+// ===== VOICE INPUT =====
+let recognition=null;
+let listening=false;
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SpeechRecognition){
+  recognition=new SpeechRecognition();
+  recognition.lang='kk-KZ';
+  recognition.continuous=false;
+  recognition.interimResults=true;
+  recognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('cwInput').value=final||interim;
+  };
+  recognition.onend=()=>{
+    listening=false;
+    document.getElementById('cwMic').classList.remove('listening');
+    document.getElementById('micHint').style.display='none';
+    document.getElementById('cwMic').textContent='🎤';
+    // auto-send if there's text
+    const val=document.getElementById('cwInput').value.trim();
+    if(val)cwSend();
+  };
+  recognition.onerror=()=>{
+    listening=false;
+    document.getElementById('cwMic').classList.remove('listening');
+    document.getElementById('micHint').style.display='none';
+    document.getElementById('cwMic').textContent='🎤';
+    document.getElementById('cwInput').placeholder='Микрофон қолжетімді емес';
+  };
+}else{
+  document.getElementById('cwMic').style.opacity='.3';
+  document.getElementById('cwMic').title='Браузер қолдамайды';
+}
+
+function toggleMic(){
+  if(!recognition)return;
+  if(listening){
+    recognition.stop();
+  }else{
+    listening=true;
+    document.getElementById('cwInput').value='';
+    document.getElementById('cwInput').placeholder='Сөйлеңіз...';
+    document.getElementById('cwMic').classList.add('listening');
+    document.getElementById('cwMic').textContent='⏹';
+    document.getElementById('micHint').style.display='block';
+    recognition.start();
+  }
+}
+
+// ===== RESIZE + DRAG ENGINE =====
+(function(){
+  const win=document.getElementById('chatWindow');
+  const MIN_W=280,MIN_H=320,MARGIN=8;
+  let mode=null,dir='',startX,startY,startL,startT,startW,startH;
+
+  function anchorToAbsolute(){
+    const r=win.getBoundingClientRect();
+    win.style.left=r.left+'px';win.style.top=r.top+'px';
+    win.style.bottom='auto';win.style.right='auto';
+    win.style.width=r.width+'px';win.style.height=r.height+'px';
+    win.style.transformOrigin='top left';
+  }
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+
+  win.querySelectorAll('.rz').forEach(h=>{
+    h.addEventListener('mousedown',e=>{
+      if(!cwOpen)return;
+      e.preventDefault();e.stopPropagation();
+      anchorToAbsolute();mode='resize';dir=h.dataset.dir;
+      startX=e.clientX;startY=e.clientY;
+      startL=win.offsetLeft;startT=win.offsetTop;
+      startW=win.offsetWidth;startH=win.offsetHeight;
+      win.classList.add('resizing');
+    });
+  });
+
+  document.getElementById('cwDragHandle').addEventListener('mousedown',e=>{
+    if(e.target.closest('.cw-close,.cw-clear'))return;
+    if(!cwOpen)return;
+    e.preventDefault();
+    anchorToAbsolute();mode='drag';
+    startX=e.clientX;startY=e.clientY;
+    startL=win.offsetLeft;startT=win.offsetTop;
+    win.classList.add('dragging');
+  });
+
+  document.addEventListener('mousemove',e=>{
+    if(!mode)return;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    const vw=window.innerWidth,vh=window.innerHeight;
+    if(mode==='drag'){
+      win.style.left=clamp(startL+dx,MARGIN,vw-startW-MARGIN)+'px';
+      win.style.top=clamp(startT+dy,MARGIN,vh-startH-MARGIN)+'px';
+      return;
+    }
+    let nL=startL,nT=startT,nW=startW,nH=startH;
+    if(dir.includes('e'))nW=clamp(startW+dx,MIN_W,vw-startL-MARGIN);
+    if(dir.includes('s'))nH=clamp(startH+dy,MIN_H,vh-startT-MARGIN);
+    if(dir.includes('w')){const d=clamp(dx,startL-vw+MARGIN,startW-MIN_W);nL=startL+d;nW=startW-d;}
+    if(dir.includes('n')){const d=clamp(dy,startT-vh+MARGIN,startH-MIN_H);nT=startT+d;nH=startH-d;}
+    win.style.left=nL+'px';win.style.top=nT+'px';
+    win.style.width=nW+'px';win.style.height=nH+'px';
+  });
+
+  document.addEventListener('mouseup',()=>{
+    if(!mode)return;
+    mode=null;win.classList.remove('resizing','dragging');
+  });
+
+  document.getElementById('cwDragHandle').addEventListener('touchstart',e=>{
+    if(e.target.closest('.cw-close,.cw-clear'))return;
+    if(!cwOpen)return;
+    anchorToAbsolute();mode='drag';
+    const t=e.touches[0];startX=t.clientX;startY=t.clientY;
+    startL=win.offsetLeft;startT=win.offsetTop;
+    win.classList.add('dragging');
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(mode!=='drag')return;
+    const t=e.touches[0];
+    const dx=t.clientX-startX,dy=t.clientY-startY;
+    const vw=window.innerWidth,vh=window.innerHeight;
+    win.style.left=clamp(startL+dx,MARGIN,vw-win.offsetWidth-MARGIN)+'px';
+    win.style.top=clamp(startT+dy,MARGIN,vh-win.offsetHeight-MARGIN)+'px';
+  },{passive:true});
+  document.addEventListener('touchend',()=>{if(mode==='drag'){mode=null;win.classList.remove('dragging');}});
+})();
+</script>
+</body>
+</html>
