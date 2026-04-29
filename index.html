@@ -571,20 +571,24 @@ async function cwSend(){
   inp.value='';
   document.getElementById('cwChips').style.display='none';
   cwAddMsg('user',txt);
-  cwHistory.push({role:'user',content:txt});
+  cwHistory.push({role:'user',parts:[{text:txt}]});
   cwShowTyping();
   const sb=document.getElementById('cwSendBtn');
   sb.disabled=true;
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
+    const GEMINI_KEY='AIzaSyCjtsne44IJ9gJbxNaHkGaVIW7E-Ayz9zU';
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:cwHistory})
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:SYSTEM}]},
+        contents:cwHistory
+      })
     });
     const d=await r.json();
     cwRemoveTyping();
-    const reply=d.content?.[0]?.text||'Кешіріңіз, қате орын алды.';
-    cwHistory.push({role:'assistant',content:reply});
+    const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'Кешіріңіз, қате орын алды.';
+    cwHistory.push({role:'model',parts:[{text:reply}]});
     cwAddMsg('bot',reply);
   }catch(e){
     cwRemoveTyping();
