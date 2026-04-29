@@ -571,24 +571,28 @@ async function cwSend(){
   inp.value='';
   document.getElementById('cwChips').style.display='none';
   cwAddMsg('user',txt);
-  cwHistory.push({role:'user',parts:[{text:txt}]});
+  cwHistory.push({role:'user',content:txt});
   cwShowTyping();
   const sb=document.getElementById('cwSendBtn');
   sb.disabled=true;
   try{
-    const GEMINI_KEY='AIzaSyCjtsne44IJ9gJbxNaHkGaVIW7E-Ayz9zU';
-    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
+    const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer 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',
+        'HTTP-Referer':'https://silver-crepe-1960e5.netlify.app',
+        'X-Title':'CyberBot KZ'
+      },
       body:JSON.stringify({
-        system_instruction:{parts:[{text:SYSTEM}]},
-        contents:cwHistory
+        model:'meta-llama/llama-3.1-8b-instruct:free',
+        messages:[{role:'system',content:SYSTEM},...cwHistory]
       })
     });
     const d=await r.json();
     cwRemoveTyping();
-    const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'Кешіріңіз, қате орын алды.';
-    cwHistory.push({role:'model',parts:[{text:reply}]});
+    const reply=d.choices?.[0]?.message?.content||'Кешіріңіз, қате орын алды.';
+    cwHistory.push({role:'assistant',content:reply});
     cwAddMsg('bot',reply);
   }catch(e){
     cwRemoveTyping();
