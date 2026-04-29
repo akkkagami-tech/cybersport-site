@@ -537,7 +537,7 @@ statsObs.observe(document.getElementById('statsSection'));
 // ===== CHAT WIDGET =====
 let cwOpen=false;
 let cwHistory=[];
-const SYSTEM=`Сен — "CyberBot", киберспорт тақырыбындағы AI агентсің. ТЕК қазақ тілінде жауап бер.
+const SYSTEM=`Сен — "CyberBot", киберспорт тақырыбындағы AI агентсің. МІНДЕТТІ ТҮРДЕ тек таза, дұрыс қазақ тілінде жауап бер. Орысша, ағылшынша сөздер қолданба. Қазақ әліпбиін дұрыс қолдан: ә, ө, ү, қ, ғ, ң, і, ұ әріптерін міндетті түрде жаз.
 Тақырыптарың: видео ойындар (Valorant, CS2, Dota 2, PUBG Mobile, LoL, EA FC), турнирлер, командалар, кәсіби ойыншылар, жабдықтар, мышь баптаулары (eDPI, DPI), стриминг, Қазақстандағы киберспорт.
 КЗ ойыншылар: mou (Нұрлан Момбеков) — 2017 Major чемпионы, HLTV №1; AdreN — NaVi/Gambit AWP; buster — NaVi; Молодой Экей (Данил) — CS2 стример; Zayac — Dota 2 Virtus.pro.
 Қысқа (3-5 сөйлем), достық, эмодзи қолдан.`;
@@ -583,7 +583,7 @@ async function cwSend(){
         'Authorization':'Bearer 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'
       },
       body:JSON.stringify({
-        model:'llama-3.1-8b-instant',
+        model:'llama-3.3-70b-versatile',
         messages:[{role:'system',content:SYSTEM},...cwHistory],
         max_tokens:1000
       })
