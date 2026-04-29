@@ -576,17 +576,16 @@ async function cwSend(){
   const sb=document.getElementById('cwSendBtn');
   sb.disabled=true;
   try{
-    const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer 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',
-        'HTTP-Referer':'https://silver-crepe-1960e5.netlify.app',
-        'X-Title':'CyberBot KZ'
+        'Authorization':'Bearer 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'
       },
       body:JSON.stringify({
-        model:'meta-llama/llama-3.1-8b-instruct:free',
-        messages:[{role:'system',content:SYSTEM},...cwHistory]
+        model:'llama-3.1-8b-instant',
+        messages:[{role:'system',content:SYSTEM},...cwHistory],
+        max_tokens:1000
       })
     });
     const d=await r.json();
