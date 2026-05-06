@@ -565,6 +565,29 @@ function clearChat(){
   document.getElementById('cwChips').style.display='flex';
 }
 
+async function callGemini(retries=3){
+  const KEY='AIzaSyAN6hyKZ10mDIuOO88mMhA_WKwpiDYyGCk';
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${KEY}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      system_instruction:{parts:[{text:SYSTEM}]},
+      contents:cwHistory
+    })
+  });
+  if(r.status===429 && retries>0){
+    cwRemoveTyping();
+    cwAddMsg('bot','⏳ Лимит запросов, повтор через 5 сек...');
+    await new Promise(res=>setTimeout(res,5000));
+    // удали сообщение о повторе
+    const msgs=document.getElementById('cwMessages');
+    msgs.removeChild(msgs.lastChild);
+    cwShowTyping();
+    return callGemini(retries-1);
+  }
+  return r.json();
+}
+
 async function cwSend(){
   const inp=document.getElementById('cwInput');
   const txt=inp.value.trim();
@@ -577,15 +600,7 @@ async function cwSend(){
   const sb=document.getElementById('cwSendBtn');
   sb.disabled=true;
   try{
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAN6hyKZ10mDIuOO88mMhA_WKwpiDYyGCk',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        system_instruction:{parts:[{text:SYSTEM}]},
-        contents:cwHistory
-      })
-    });
-    const d=await r.json();
+    const d=await callGemini();
     cwRemoveTyping();
     const reply=d.candidates?.[0]?.content?.parts?.[0]?.text||'Извини, произошла ошибка. Попробуй ещё раз!';
     cwHistory.push({role:'model',parts:[{text:reply}]});
